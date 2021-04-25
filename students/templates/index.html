@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+
+    <title>Django Elastic</title>
+</head>
+
+<body>
+
+    <div class="container mt-5 pt-5">
+        <div class="row">
+            <div class="col-md-3 form-group">
+                <label>Registration number </label>
+                <input onchange="getStudents()" class="form-control" id="registration_number" placeholder="First Name">
+            </div>
+
+            <div class="col-md-3 form-group">
+                <label>First Name</label>
+                <input onchange="getStudents()" class="form-control" id="first_name" placeholder="First Name">
+            </div>
+
+            <div class="col-md-3 form-group">
+                <label>Sort By</label>
+                <select class="form-control" id="sort">
+                    <option>Choose</option>
+                    <option value="first_name">First Name</option>
+                    <option value="date_of_admission">Date of Admission</option>
+                </select>
+            </div>
+
+
+
+            <table class="table mt-5">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Registration number</th>
+                        <th scope="col">First name</th>
+                        <th scope="col">Last name</th>
+                        <th scope="col">Date of admission</th>
+                        <th scope="col">Created At</th>
+
+
+                    </tr>
+                </thead>
+                <tbody id="data">
+
+
+
+                </tbody>
+            </table>
+
+            <p style="display: none" id="not_found">No Data found</p>
+
+        </div>
+
+
+        <script>
+            function getStudents() {
+
+                var first_name = document.getElementById('first_name').value
+                var registration_number = document.getElementById('registration_number').value
+
+                console.log(`/search/search/?first_name__contains=${first_name}&registration_number__contains=${registration_number}`)
+                fetch(`/search/search/?first_name__contains=${first_name}&registration_number__contains=${registration_number}`)
+                    .then(response => response.json())
+                    .then(result => {
+
+                        console.log(result)
+
+                        if(result.length == 0){
+                        document.getElementById('data').innerHTML = ''
+
+                            document.getElementById('not_found').style.display = ''
+                            return;
+                        }else{
+                            document.getElementById('not_found').style.display = 'none'
+
+                        }
+
+                        var html = '';
+
+                        for (var i = 0; i < result.length; i++) {
+                            html += `
+                                        <tr>
+                        <th scope="row">${i+1}</th>
+                        <td>${result[i].registration_number}</td>
+                        <td>${result[i].first_name}</td>
+
+                        <td>${result[i].last_name}</td>
+                        <td>${result[i].date_of_admission}</td>
+                        <td>${result[i].created_at}</td>
+                        </tr>
+                    `
+                        }
+
+
+                        document.getElementById('data').innerHTML = html
+
+                    })
+
+            }
+
+
+            getStudents()
+        </script>
+
+
+
+
+</body>
+
+</html>
